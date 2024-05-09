@@ -1,45 +1,27 @@
 import { auth } from "express-oauth2-jwt-bearer";
-import "dotenv/config";
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import User from "../models/user";
 
-/**
- * Extends the Express Request interface to include additional properties.
- */
 declare global {
   namespace Express {
     interface Request {
-      auth0Id: string;
       userId: string;
+      auth0Id: string;
     }
   }
 }
 
-/**
- * Middleware function to check the validity of JWT tokens.
- * 
- * @param {Request} req - The request object.
- * @param {Response} res - The response object.
- * @param {NextFunction} next - The next function to call in the middleware chain.
- */
 export const jwtCheck = auth({
   audience: process.env.AUTH0_AUDIENCE,
   issuerBaseURL: process.env.AUTH0_ISSUER_BASE_URL,
-  tokenSigningAlg: 'RS256',
+  tokenSigningAlg: "RS256",
 });
 
-/**
- * Middleware function to parse JWT tokens and extract user information.
- * 
- * @param {Request} req - The request object.
- * @param {Response} res - The response object.
- * @param {NextFunction} next - The next function to call in the middleware chain.
- */
 export const jwtParse = async (
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) => {
   const { authorization } = req.headers;
 
@@ -47,6 +29,7 @@ export const jwtParse = async (
     return res.sendStatus(401);
   }
 
+  // Bearer lshdflshdjkhvjkshdjkvh34h5k3h54jkh
   const token = authorization.split(" ")[1];
 
   try {
@@ -63,7 +46,6 @@ export const jwtParse = async (
     req.userId = user._id.toString();
     next();
   } catch (error) {
-    console.log(error);
     return res.sendStatus(401);
   }
 };
